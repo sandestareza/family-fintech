@@ -1,11 +1,6 @@
-import { Wallet, Landmark, PieChart } from 'lucide-react'
+import { Wallet, ChartBar, PieChart } from 'lucide-react'
 
 const features = [
-  {
-    icon: Landmark,
-    title: "Sync Bank",
-    description: "Hubungkan rekening bank Anda untuk pelacakan otomatis yang aman."
-  },
   {
     icon: Wallet,
     title: "Shared Wallet",
@@ -15,6 +10,11 @@ const features = [
     icon: PieChart,
     title: "Budgeting",
     description: "Buat anggaran bulanan dan pantau pengeluaran agar tetap on track."
+  },
+  {
+    icon: ChartBar,
+    title: "Analytics",
+    description: "Dapatkan wawasan tentang kebiasaan pengeluaran Anda dan buat keputusan yang lebih baik."
   }
 ]
 

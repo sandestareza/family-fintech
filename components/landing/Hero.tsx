@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react'
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden py-20 text-center md:py-32">
+    <section className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden py-20 text-center">
       <div className="z-10 px-4 md:px-6">
         <div className="mb-6 inline-flex items-center rounded-full border border-zinc-200 bg-white/50 px-3 py-1 text-sm text-zinc-800 backdrop-blur-sm dark:border-zinc-800 dark:bg-black/50 dark:text-zinc-200">
           <span className="mr-2 flex h-2 w-2 rounded-full bg-emerald-500"></span>
@@ -23,7 +23,7 @@ export function Hero() {
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Button size="lg" className="h-12 w-full px-8 text-lg sm:w-auto" asChild>
             <Link href="/register">
-              Coba Gratis 14 Hari
+              Coba Sekarang
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
