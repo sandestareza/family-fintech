@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -8,27 +8,34 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { profileSchema, ProfileValues } from "@/lib/validations/profile"
-import { updateProfile } from "@/lib/actions/profile"
-import { useState } from "react"
-import { Loader2 } from "lucide-react"
-import { useRouter } from "next/navigation"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { profileSchema, ProfileValues } from "@/lib/validations/profile";
+import { updateProfile } from "@/lib/actions/profile";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface ProfileSettingsProps {
   initialData: {
-    full_name: string
-    email: string
-  }
+    full_name: string;
+    email: string;
+  };
 }
 
 export function ProfileSettings({ initialData }: ProfileSettingsProps) {
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const form = useForm<ProfileValues>({
     resolver: zodResolver(profileSchema),
@@ -36,16 +43,19 @@ export function ProfileSettings({ initialData }: ProfileSettingsProps) {
       full_name: initialData.full_name || "",
       email: initialData.email || "",
     },
-  })
+  });
 
   async function onSubmit(data: ProfileValues) {
-    setIsLoading(true)
-    const result = await updateProfile({ full_name: data.full_name })
-    setIsLoading(false)
-    
+    setIsLoading(true);
+    const result = await updateProfile({ full_name: data.full_name });
+    setIsLoading(false);
+
     if (!result?.error) {
-      router.refresh()
+      toast.success("Profil berhasil diperbarui");
+      router.refresh();
+      return;
     }
+    toast.error(result?.error);
   }
 
   return (
@@ -96,5 +106,5 @@ export function ProfileSettings({ initialData }: ProfileSettingsProps) {
         </Form>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -17,26 +17,27 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { CurrencyInput } from "@/components/ui/currency-input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-  } from "@/components/ui/select"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, Plus } from "lucide-react"
-import { createWallet } from "@/lib/actions/wallets"
-import { walletSchema, WalletValues } from "@/lib/validations/wallets"
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Plus } from "lucide-react";
+import { createWallet } from "@/lib/actions/wallets";
+import { walletSchema, WalletValues } from "@/lib/validations/wallets";
+import { toast } from "sonner";
 
 export function AddWalletDialog() {
-  const [open, setOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<WalletValues>({
     resolver: zodResolver(walletSchema),
@@ -45,19 +46,20 @@ export function AddWalletDialog() {
       type: "cash",
       initialBalance: 0,
     },
-  })
+  });
 
   async function onSubmit(data: WalletValues) {
-    setIsLoading(true)
-    const result = await createWallet(data)
-    setIsLoading(false)
+    setIsLoading(true);
+    const result = await createWallet(data);
+    setIsLoading(false);
 
     if (result?.error) {
-      console.error(result.error)
-      // Toast error here
+      console.log(result.error);
+      toast.error(result.error);
     } else {
-      setOpen(false)
-      form.reset()
+      setOpen(false);
+      form.reset();
+      toast.success("Dompet berhasil ditambahkan");
     }
   }
 
@@ -97,7 +99,10 @@ export function AddWalletDialog() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Tipe</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Pilih tipe" />
@@ -106,7 +111,9 @@ export function AddWalletDialog() {
                     <SelectContent>
                       <SelectItem value="cash">Tunai</SelectItem>
                       <SelectItem value="bank">Bank</SelectItem>
-                      <SelectItem value="ewallet">E-Wallet (OVO, GoPay, dll)</SelectItem>
+                      <SelectItem value="ewallet">
+                        E-Wallet (OVO, GoPay, dll)
+                      </SelectItem>
                       <SelectItem value="credit_card">Kartu Kredit</SelectItem>
                       <SelectItem value="investment">Investasi</SelectItem>
                       <SelectItem value="other">Lainnya</SelectItem>
@@ -124,10 +131,10 @@ export function AddWalletDialog() {
                 <FormItem>
                   <FormLabel>Saldo Awal</FormLabel>
                   <FormControl>
-                    <CurrencyInput 
-                      value={field.value} 
+                    <CurrencyInput
+                      value={field.value}
                       onValueChange={field.onChange}
-                      placeholder="0" 
+                      placeholder="0"
                     />
                   </FormControl>
                   <FormMessage />
@@ -145,5 +152,5 @@ export function AddWalletDialog() {
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

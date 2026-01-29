@@ -62,7 +62,7 @@ export async function joinHousehold(inviteCode: string) {
 
   // 1. Find Household by code via RPC (bypasses RLS)
   const { data: household, error: findError } = await supabase
-    .rpc('get_household_by_invite_code', { code: inviteCode })
+    .rpc('get_household_by_invite_code', { code: inviteCode.toUpperCase() })
     .single() as { data: { id: string }, error: unknown }
   
   if (findError || !household) {
@@ -88,7 +88,7 @@ export async function joinHousehold(inviteCode: string) {
     .insert({
       household_id: household.id,
       user_id: user.id,
-      role: "member",
+      role: "istri",
     })
 
   if (joinError) {

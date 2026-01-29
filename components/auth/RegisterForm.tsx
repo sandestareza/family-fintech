@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { Button } from "@/components/ui/button"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -10,15 +10,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton"
-import { registerSchema, RegisterValues } from "@/lib/validations/auth"
-import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
+import { registerSchema, RegisterValues } from "@/lib/validations/auth";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export function RegisterForm() {
-  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   const form = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -27,10 +31,10 @@ export function RegisterForm() {
       password: "",
       confirmPassword: "",
     },
-  })
+  });
 
   async function onSubmit(data: RegisterValues) {
-    const supabase = createClient()
+    const supabase = createClient();
     const { error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
@@ -39,15 +43,16 @@ export function RegisterForm() {
           full_name: data.name,
         },
       },
-    })
+    });
 
     if (error) {
-      console.error(error)
-      // Ideally show toast here
-      return
+      console.error(error);
+      toast.error(error.message);
+      setIsLoading(false);
+      return;
     }
 
-    router.push(`/verify-email?email=${encodeURIComponent(data.email)}`)
+    router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
   }
 
   return (
@@ -105,8 +110,8 @@ export function RegisterForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full">
-          Daftar
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Daftar"}
         </Button>
       </form>
       <div className="relative">
@@ -114,10 +119,12 @@ export function RegisterForm() {
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-white px-2 text-zinc-500 dark:bg-black">Atau</span>
+          <span className="bg-white px-2 text-zinc-500 dark:bg-black">
+            Atau
+          </span>
         </div>
       </div>
       <GoogleAuthButton />
     </Form>
-  )
+  );
 }

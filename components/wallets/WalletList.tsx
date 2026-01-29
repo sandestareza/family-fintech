@@ -22,6 +22,7 @@ import { useState } from "react";
 import { EditWalletDialog } from "./EditWalletDialog";
 import { deleteWallet } from "@/lib/actions/wallets";
 import { formatCurrency } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface WalletItem {
   id: string;
@@ -56,7 +57,13 @@ export function WalletList({ wallets }: { wallets: WalletItem[] }) {
         "Apakah Anda yakin ingin menghapus dompet ini? Transaksi terkait tidak akan terhapus, namun tidak akan memiliki dompet.",
       )
     ) {
-      await deleteWallet(id);
+      const result = await deleteWallet(id);
+      if (result?.error) {
+        console.log(result.error);
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Dompet berhasil dihapus");
     }
   };
 

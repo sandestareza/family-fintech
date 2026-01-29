@@ -33,6 +33,7 @@ import { budgetSchema, BudgetValues } from "@/lib/validations/budget";
 import { createBudget } from "@/lib/actions/budget";
 import { useState } from "react";
 import { Loader2, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 interface Category {
   id: string;
@@ -62,7 +63,10 @@ export function CreateBudgetDialog({ categories }: { categories: Category[] }) {
     if (!result?.error) {
       setOpen(false);
       form.reset();
+      toast.success("Budget berhasil ditambahkan");
+      return;
     }
+    toast.error(result?.error);
   }
 
   return (

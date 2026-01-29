@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { Button } from "@/components/ui/button"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -10,39 +10,47 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { createHouseholdSchema, CreateHouseholdValues } from "@/lib/validations/onboarding"
-import { createHousehold } from "@/lib/actions/onboarding"
-import { useState } from "react"
-import { Loader2 } from "lucide-react"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  createHouseholdSchema,
+  CreateHouseholdValues,
+} from "@/lib/validations/onboarding";
+import { createHousehold } from "@/lib/actions/onboarding";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export function CreateHouseholdForm() {
-  const [isLoading, setIsLoading] = useState(false)
-  
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<CreateHouseholdValues>({
     resolver: zodResolver(createHouseholdSchema),
     defaultValues: {
       name: "",
       currency: "IDR",
     },
-  })
+  });
 
   async function onSubmit(data: CreateHouseholdValues) {
-    setIsLoading(true)
-    const result = await createHousehold(data.name, data.currency)
+    setIsLoading(true);
+    const result = await createHousehold(data.name, data.currency);
     if (result?.error) {
-       // Ideally show toast
-       console.error(result.error)
-       setIsLoading(false)
+      toast.error(result.error);
+      console.log(result.error);
+      setIsLoading(false);
+      return;
     }
-    // Redirect handles success state, but if we stay here:
-    // setIsLoading(false)
+    toast.success("Keluarga berhasil dibuat");
+    setIsLoading(false);
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 text-left">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4 text-left"
+      >
         <FormField
           control={form.control}
           name="name"
@@ -58,9 +66,9 @@ export function CreateHouseholdForm() {
         />
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Buat Dompet
+          Buat Nama Keluarga
         </Button>
       </form>
     </Form>
-  )
+  );
 }

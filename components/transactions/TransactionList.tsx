@@ -14,6 +14,7 @@ import { useState } from "react"
 import { deleteTransaction } from "@/lib/actions/transactions"
 import { EditTransactionDialog } from "./EditTransactionDialog"
 import { formatCurrency } from "@/lib/utils"
+import { toast } from "sonner"
 
 interface Category {
   id: string
@@ -43,7 +44,13 @@ export function TransactionList({
 
     const handleDelete = async (id: string) => {
         if (confirm("Apakah Anda yakin ingin menghapus transaksi ini?")) {
-            await deleteTransaction(id)
+            const result = await deleteTransaction(id)
+            if (result?.error) {
+                console.log(result.error);
+                toast.error(result.error);
+                return;
+            }
+            toast.success("Transaksi berhasil dihapus");
         }
     }
 

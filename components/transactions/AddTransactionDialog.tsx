@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -17,56 +17,67 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { CurrencyInput } from "@/components/ui/currency-input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
+} from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
-import { format } from "date-fns"
-import { CalendarIcon, Loader2, Plus } from "lucide-react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { transactionSchema, TransactionValues } from "@/lib/validations/transactions"
-import { createTransaction } from "@/lib/actions/transactions"
-import { useState } from "react"
-import { AddCategoryDialog } from "./AddCategoryDialog"
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { CalendarIcon, Loader2, Plus } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  transactionSchema,
+  TransactionValues,
+} from "@/lib/validations/transactions";
+import { createTransaction } from "@/lib/actions/transactions";
+import { useState } from "react";
+import { AddCategoryDialog } from "./AddCategoryDialog";
+import { toast } from "sonner";
 
 interface Category {
-  id: string
-  name: string
-  type: string
+  id: string;
+  name: string;
+  type: string;
 }
 
 interface Wallet {
-  id: string
-  name: string
-  balance: number
+  id: string;
+  name: string;
+  balance: number;
 }
 
-export function AddTransactionDialog({ 
-  categories = [], 
-  wallets = []
-}: { 
-  categories: Category[]
-  wallets: Wallet[]
+export function AddTransactionDialog({
+  categories = [],
+  wallets = [],
+}: {
+  categories: Category[];
+  wallets: Wallet[];
 }) {
-  const [open, setOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Default wallet: try to find 'Cash' or first one
-  const defaultWalletId = wallets?.find(w => w.name.toLowerCase().includes('tunai') || w.name.toLowerCase().includes('cash'))?.id || wallets[0]?.id || ""
+  const defaultWalletId =
+    wallets?.find(
+      (w) =>
+        w.name.toLowerCase().includes("tunai") ||
+        w.name.toLowerCase().includes("cash"),
+    )?.id ||
+    wallets[0]?.id ||
+    "";
 
   const form = useForm<TransactionValues>({
     resolver: zodResolver(transactionSchema),
@@ -77,34 +88,35 @@ export function AddTransactionDialog({
       date: new Date().toISOString(),
       walletId: defaultWalletId,
     },
-  })
+  });
 
   // Filter categories based on selected type
   // eslint-disable-next-line react-hooks/incompatible-library
-  const type = form.watch("type")
-  const filteredCategories = categories.filter((c) => c.type === type)
+  const type = form.watch("type");
+  const filteredCategories = categories.filter((c) => c.type === type);
 
   async function onSubmit(data: TransactionValues) {
-    setIsLoading(true)
+    setIsLoading(true);
     const result = await createTransaction({
-        ...data,
-        date: new Date(data.date).toISOString() // Ensure ISO string
-    })
-    
-    setIsLoading(false)
+      ...data,
+      date: new Date(data.date).toISOString(), // Ensure ISO string
+    });
+
+    setIsLoading(false);
 
     if (result?.error) {
-      console.error(result.error)
-      // Toast error here
+      console.log(result.error);
+      toast.error(result.error)
     } else {
-      setOpen(false)
+      setOpen(false);
       form.reset({
         ...data,
         amount: 0,
         description: "",
-        date: new Date().toISOString(), 
+        date: new Date().toISOString(),
         // keep wallet and type same
-      })
+      });
+      toast.success("Transaksi berhasil ditambahkan")
     }
   }
 
@@ -125,52 +137,58 @@ export function AddTransactionDialog({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-                <FormField
+              <FormField
                 control={form.control}
                 name="type"
                 render={({ field }) => (
-                    <FormItem>
+                  <FormItem>
                     <FormLabel>Tipe</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
                         <SelectTrigger>
-                            <SelectValue placeholder="Pilih tipe" />
+                          <SelectValue placeholder="Pilih tipe" />
                         </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
+                      </FormControl>
+                      <SelectContent>
                         <SelectItem value="expense">Pengeluaran</SelectItem>
                         <SelectItem value="income">Pemasukan</SelectItem>
-                        </SelectContent>
+                      </SelectContent>
                     </Select>
                     <FormMessage />
-                    </FormItem>
+                  </FormItem>
                 )}
-                />
+              />
 
-                <FormField
+              <FormField
                 control={form.control}
                 name="walletId"
                 render={({ field }) => (
-                    <FormItem>
+                  <FormItem>
                     <FormLabel>Dompet</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
                         <SelectTrigger>
-                            <SelectValue placeholder="Pilih dompet" />
+                          <SelectValue placeholder="Pilih dompet" />
                         </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
+                      </FormControl>
+                      <SelectContent>
                         {wallets.map((w) => (
-                            <SelectItem key={w.id} value={w.id}>
-                                {w.name}
-                            </SelectItem>
+                          <SelectItem key={w.id} value={w.id}>
+                            {w.name}
+                          </SelectItem>
                         ))}
-                        </SelectContent>
+                      </SelectContent>
                     </Select>
                     <FormMessage />
-                    </FormItem>
+                  </FormItem>
                 )}
-                />
+              />
             </div>
 
             <FormField
@@ -180,10 +198,10 @@ export function AddTransactionDialog({
                 <FormItem>
                   <FormLabel>Jumlah</FormLabel>
                   <FormControl>
-                    <CurrencyInput 
-                      value={field.value} 
+                    <CurrencyInput
+                      value={field.value}
                       onValueChange={field.onChange}
-                      placeholder="0" 
+                      placeholder="0"
                     />
                   </FormControl>
                   <FormMessage />
@@ -198,21 +216,26 @@ export function AddTransactionDialog({
                 <FormItem>
                   <FormLabel>Kategori</FormLabel>
                   <div className="flex gap-2">
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih kategori" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {filteredCategories.map((c) => (
-                            <SelectItem key={c.id} value={c.id}>
-                              {c.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <AddCategoryDialog defaultType={type as "income"|"expense"} />
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih kategori" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {filteredCategories.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <AddCategoryDialog
+                      defaultType={type as "income" | "expense"}
+                    />
                   </div>
                   <FormMessage />
                 </FormItem>
@@ -232,7 +255,7 @@ export function AddTransactionDialog({
                           variant={"outline"}
                           className={cn(
                             "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
+                            !field.value && "text-muted-foreground",
                           )}
                         >
                           {field.value ? (
@@ -247,7 +270,9 @@ export function AddTransactionDialog({
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
-                        selected={field.value ? new Date(field.value) : undefined}
+                        selected={
+                          field.value ? new Date(field.value) : undefined
+                        }
                         onSelect={(date) => field.onChange(date?.toISOString())}
                         disabled={(date) =>
                           date > new Date() || date < new Date("1900-01-01")
@@ -285,5 +310,5 @@ export function AddTransactionDialog({
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

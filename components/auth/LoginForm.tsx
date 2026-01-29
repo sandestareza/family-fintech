@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { Button } from "@/components/ui/button"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -10,53 +10,60 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton"
-import { loginSchema, LoginValues } from "@/lib/validations/auth"
-import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
+import { loginSchema, LoginValues } from "@/lib/validations/auth";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 export function LoginForm() {
-  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
-  })
+  });
 
   async function onSubmit(data: LoginValues) {
-    const supabase = createClient()
+    setIsLoading(true);
+    const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password,
-    })
+    });
 
     if (error) {
-      console.error(error)
-      // Ideally show toast
-      return
+      toast.error(error.message);
+      setIsLoading(false);
+      return;
     }
 
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (user) {
       // Check if user has a household
       const { count } = await supabase
         .from("household_members")
-        .select("*", { count: 'exact', head: true })
-        .eq("user_id", user.id)
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id);
 
       if (count && count > 0) {
-        router.push("/dashboard")
+        router.push("/dashboard");
       } else {
-        router.push("/onboarding")
+        router.push("/onboarding");
       }
     } else {
       // Fallback if getUser fails but signIn didn't error (unlikely)
-       router.push("/onboarding")
+      router.push("/onboarding");
     }
   }
 
@@ -89,8 +96,8 @@ export function LoginForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full">
-          Masuk
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Masuk"}
         </Button>
       </form>
       <div className="relative">
@@ -98,10 +105,12 @@ export function LoginForm() {
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-white px-2 text-zinc-500 dark:bg-black">Atau</span>
+          <span className="bg-white px-2 text-zinc-500 dark:bg-black">
+            Atau
+          </span>
         </div>
       </div>
       <GoogleAuthButton />
     </Form>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -17,36 +17,41 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { CurrencyInput } from "@/components/ui/currency-input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { transferFunds } from "@/lib/actions/wallets"
-import { transferSchema, TransferValues } from "@/lib/validations/wallets"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { ArrowRightLeft, CalendarIcon, Loader2 } from "lucide-react"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
-import { format } from "date-fns"
-import { Calendar } from "@/components/ui/calendar"
+} from "@/components/ui/select";
+import { transferFunds } from "@/lib/actions/wallets";
+import { transferSchema, TransferValues } from "@/lib/validations/wallets";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowRightLeft, CalendarIcon, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { toast } from "sonner";
 
 interface Wallet {
-  id: string
-  name: string
-  balance: number
+  id: string;
+  name: string;
+  balance: number;
 }
 
 export function TransferDialog({ wallets }: { wallets: Wallet[] }) {
-  const [open, setOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<TransferValues>({
     resolver: zodResolver(transferSchema),
@@ -57,29 +62,32 @@ export function TransferDialog({ wallets }: { wallets: Wallet[] }) {
       description: "",
       date: new Date().toISOString(),
     },
-  })
+  });
 
   // Prevent selecting same wallet
   // eslint-disable-next-line react-hooks/incompatible-library
-  const fromWalletId = form.watch("fromWalletId")
-  const availableToWallets = wallets.filter((w) => w.id !== fromWalletId)
+  const fromWalletId = form.watch("fromWalletId");
+  const availableToWallets = wallets.filter((w) => w.id !== fromWalletId);
 
   async function onSubmit(data: TransferValues) {
     if (data.fromWalletId === data.toWalletId) {
-        form.setError("toWalletId", { message: "Dompet tujuan tidak boleh sama dengan asal" })
-        return
+      form.setError("toWalletId", {
+        message: "Dompet tujuan tidak boleh sama dengan asal",
+      });
+      return;
     }
 
-    setIsLoading(true)
-    const result = await transferFunds(data)
-    setIsLoading(false)
+    setIsLoading(true);
+    const result = await transferFunds(data);
+    setIsLoading(false);
 
     if (result?.error) {
-      console.error(result.error)
-      // Toast error here
+      console.log(result.error);
+      toast.error(result.error);
     } else {
-      setOpen(false)
-      form.reset()
+      setOpen(false);
+      form.reset();
+      toast.success("Transfer berhasil");
     }
   }
 
@@ -100,55 +108,67 @@ export function TransferDialog({ wallets }: { wallets: Wallet[] }) {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-                <FormField
+              <FormField
                 control={form.control}
                 name="fromWalletId"
                 render={({ field }) => (
-                    <FormItem>
+                  <FormItem>
                     <FormLabel>Dari</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
                         <SelectTrigger>
-                            <SelectValue placeholder="Pilih dompet" />
+                          <SelectValue placeholder="Pilih dompet" />
                         </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
+                      </FormControl>
+                      <SelectContent>
                         {wallets.map((w) => (
-                            <SelectItem key={w.id} value={w.id}>
-                                {w.name} ({new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(w.balance)})
-                            </SelectItem>
+                          <SelectItem key={w.id} value={w.id}>
+                            {w.name} (
+                            {new Intl.NumberFormat("id-ID", {
+                              style: "currency",
+                              currency: "IDR",
+                              maximumFractionDigits: 0,
+                            }).format(w.balance)}
+                            )
+                          </SelectItem>
                         ))}
-                        </SelectContent>
+                      </SelectContent>
                     </Select>
                     <FormMessage />
-                    </FormItem>
+                  </FormItem>
                 )}
-                />
+              />
 
-                <FormField
+              <FormField
                 control={form.control}
                 name="toWalletId"
                 render={({ field }) => (
-                    <FormItem>
+                  <FormItem>
                     <FormLabel>Ke</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
                         <SelectTrigger>
-                            <SelectValue placeholder="Pilih dompet" />
+                          <SelectValue placeholder="Pilih dompet" />
                         </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
+                      </FormControl>
+                      <SelectContent>
                         {availableToWallets.map((w) => (
-                            <SelectItem key={w.id} value={w.id}>
-                                {w.name}
-                            </SelectItem>
+                          <SelectItem key={w.id} value={w.id}>
+                            {w.name}
+                          </SelectItem>
                         ))}
-                        </SelectContent>
+                      </SelectContent>
                     </Select>
                     <FormMessage />
-                    </FormItem>
+                  </FormItem>
                 )}
-                />
+              />
             </div>
 
             <FormField
@@ -158,10 +178,10 @@ export function TransferDialog({ wallets }: { wallets: Wallet[] }) {
                 <FormItem>
                   <FormLabel>Jumlah</FormLabel>
                   <FormControl>
-                    <CurrencyInput 
-                      value={field.value} 
+                    <CurrencyInput
+                      value={field.value}
                       onValueChange={field.onChange}
-                      placeholder="0" 
+                      placeholder="0"
                     />
                   </FormControl>
                   <FormMessage />
@@ -182,7 +202,7 @@ export function TransferDialog({ wallets }: { wallets: Wallet[] }) {
                           variant={"outline"}
                           className={cn(
                             "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
+                            !field.value && "text-muted-foreground",
                           )}
                         >
                           {field.value ? (
@@ -197,7 +217,9 @@ export function TransferDialog({ wallets }: { wallets: Wallet[] }) {
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
-                        selected={field.value ? new Date(field.value) : undefined}
+                        selected={
+                          field.value ? new Date(field.value) : undefined
+                        }
                         onSelect={(date) => field.onChange(date?.toISOString())}
                         disabled={(date) =>
                           date > new Date() || date < new Date("1900-01-01")
@@ -235,5 +257,5 @@ export function TransferDialog({ wallets }: { wallets: Wallet[] }) {
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

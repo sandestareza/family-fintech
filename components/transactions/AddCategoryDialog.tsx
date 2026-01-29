@@ -32,6 +32,7 @@ import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2, Plus } from "lucide-react"
 import { createCategory } from "@/lib/actions/transactions"
+import { toast } from "sonner"
 
 const categorySchema = z.object({
   name: z.string().min(1, "Nama kategori wajib diisi"),
@@ -67,10 +68,11 @@ export function AddCategoryDialog({
 
     if (result?.error) {
       console.error(result.error)
-      // Toast error here
+      toast.error(result.error)
     } else {
       setOpen(false)
       form.reset()
+      toast.success("Kategori berhasil ditambahkan")
     }
   }
 
