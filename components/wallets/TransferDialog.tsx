@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { CurrencyInput } from "@/components/ui/currency-input"
 import {
   Select,
   SelectContent,
@@ -157,7 +158,11 @@ export function TransferDialog({ wallets }: { wallets: Wallet[] }) {
                 <FormItem>
                   <FormLabel>Jumlah</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="0" {...field} />
+                    <CurrencyInput 
+                      value={field.value} 
+                      onValueChange={field.onChange}
+                      placeholder="0" 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

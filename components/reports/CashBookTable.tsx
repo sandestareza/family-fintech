@@ -8,24 +8,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { format } from "date-fns"
-import { id } from "date-fns/locale"
 import { LedgerTransaction } from "@/lib/actions/reports"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowDownCircle, ArrowUpCircle } from "lucide-react"
+import { formatCurrency, formatDate } from "@/lib/utils"
 
 export function CashBookTable({ transactions }: { transactions: LedgerTransaction[] }) {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      maximumFractionDigits: 0,
-    }).format(amount)
-  }
-
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), "dd/MM/yyyy", { locale: id })
-  }
 
   return (
     <Card>

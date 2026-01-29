@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import {
   Select,
   SelectContent,
@@ -115,11 +116,10 @@ export function CreateBudgetDialog({ categories }: { categories: Category[] }) {
                 <FormItem>
                   <FormLabel>Batas Budget</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="number" 
+                    <CurrencyInput 
+                      value={field.value} 
+                      onValueChange={field.onChange}
                       placeholder="1000000" 
-                      {...field}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                     />
                   </FormControl>
                   <FormMessage />

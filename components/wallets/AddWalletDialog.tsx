@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { CurrencyInput } from "@/components/ui/currency-input"
 import {
     Select,
     SelectContent,
@@ -123,7 +124,11 @@ export function AddWalletDialog() {
                 <FormItem>
                   <FormLabel>Saldo Awal</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="0" {...field} onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)} />
+                    <CurrencyInput 
+                      value={field.value} 
+                      onValueChange={field.onChange}
+                      placeholder="0" 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
