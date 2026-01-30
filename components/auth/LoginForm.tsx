@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { loginSchema, LoginValues } from "@/lib/validations/auth";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
@@ -23,10 +23,12 @@ import { Loader2 } from "lucide-react";
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const email = searchParams.get('email')
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      email: email || "",
       password: "",
     },
   });

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { InviteCodeCard } from "@/components/settings/InviteCodeCard"
+import { HouseholdSettings } from "@/components/settings/HouseholdSettings"
 import { MemberList } from "@/components/settings/MemberList"
 import { ProfileSettings } from "@/components/settings/ProfileSettings"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -11,14 +12,17 @@ export default async function SettingsPage() {
   
   if (!user) return null
 
-  // Fetch household invite code
-  const { data: member } = await supabase
+  // Fetch household data with member role
+  const { data: memberData } = await supabase
     .from("household_members")
-    .select("households (invite_code)")
+    .select("role, households (id, name, invite_code)")
     .eq("user_id", user.id)
     .single()
     
-  const inviteCode = (member?.households as unknown as { invite_code: string })?.invite_code || "ERROR"
+  const household = memberData?.households as unknown as { id: string; name: string; invite_code: string }
+  const inviteCode = household?.invite_code || "ERROR"
+  const householdName = household?.name || "Keluarga"
+  const userRole = memberData?.role || "istri"
   
   // Get profile data
   const profile = await getProfile()
@@ -43,6 +47,11 @@ export default async function SettingsPage() {
         </TabsContent>
         
         <TabsContent value="household" className="space-y-6">
+          <HouseholdSettings 
+            householdId={household?.id || ""}
+            householdName={householdName}
+            userRole={userRole}
+          />
           <InviteCodeCard code={inviteCode} />
           <MemberList />
         </TabsContent>

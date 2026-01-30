@@ -34,6 +34,7 @@ export function RegisterForm() {
   });
 
   async function onSubmit(data: RegisterValues) {
+    setIsLoading(true);
     const supabase = createClient();
     const { error } = await supabase.auth.signUp({
       email: data.email,

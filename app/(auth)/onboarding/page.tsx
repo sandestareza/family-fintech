@@ -15,7 +15,7 @@ export default function OnboardingPage() {
       <div className="space-y-2 text-center">
         <h1 className="text-2xl font-bold tracking-tight">
           {mode === 'selection' && "Selamat Datang!"}
-          {mode === 'create' && "Buat Dompet Baru"}
+          {mode === 'create' && "Buat Keluarga Baru"}
           {mode === 'join' && "Gabung Keluarga"}
         </h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">

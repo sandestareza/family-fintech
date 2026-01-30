@@ -31,7 +31,7 @@ export default async function VerifyEmailPage({
             Klik link di email tersebut untuk mengaktifkan akunmu, lalu login.
         </p>
         <Button asChild className="w-full">
-            <Link href="/login">
+            <Link href={`/login?email=${encodeURIComponent(email || '')}`}>
                 Ke Halaman Login
             </Link>
         </Button>

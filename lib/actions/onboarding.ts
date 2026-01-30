@@ -1,72 +1,77 @@
-"use server"
+"use server";
 
-import { createClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
-import { nanoid } from "nanoid"
-import { randomUUID } from "crypto"
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
+import { nanoid } from "nanoid";
+import { randomUUID } from "crypto";
 
 export async function createHousehold(name: string, currency: string) {
-  const supabase = await createClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
-    console.log(error);
-    
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  console.log(error);
+
   if (error || !user) {
-    throw new Error("Unauthorized")
+    throw new Error("Unauthorized");
   }
 
   // Generate a random 6-character invite code
   // Custom alphabet to avoid confusion (no 0/O, 1/I)
-  const inviteCode = nanoid(6).toUpperCase()
+  const inviteCode = nanoid(6).toUpperCase();
 
-  const householdId = randomUUID()
+  const householdId = randomUUID();
 
   // 1. Create Household
-  const { error: householdError } = await supabase
-    .from("households")
-    .insert({
-      id: householdId,
-      name,
-      currency,
-      invite_code: inviteCode,
-    })
+  const { error: householdError } = await supabase.from("households").insert({
+    id: householdId,
+    name,
+    currency,
+    invite_code: inviteCode,
+  });
 
   if (householdError) {
-    console.error("Error creating household:", householdError)
-    return { error: householdError.message }
+    console.error("Error creating household:", householdError);
+    return { error: householdError.message };
   }
 
   // 2. Add creator as Suami
-  const { error: memberError } = await supabase.from("household_members")
+  const { error: memberError } = await supabase
+    .from("household_members")
     .insert({
       household_id: householdId,
       user_id: user.id,
       role: "suami",
-    })
+    });
 
   if (memberError) {
-    console.error("Error adding member:", memberError)
+    console.error("Error adding member:", memberError);
     // Cleanup household if member creation fails? Technically yes, but for now simple error return
-    return { error: memberError.message }
+    return { error: memberError.message };
   }
 
-  redirect("/dashboard")
+  redirect("/dashboard");
 }
 
 export async function joinHousehold(inviteCode: string) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    throw new Error("Unauthorized")
+    throw new Error("Unauthorized");
   }
 
   // 1. Find Household by code via RPC (bypasses RLS)
-  const { data: household, error: findError } = await supabase
-    .rpc('get_household_by_invite_code', { code: inviteCode.toUpperCase() })
-    .single() as { data: { id: string }, error: unknown }
-  
+  const { data: household, error: findError } = (await supabase
+    .rpc("get_household_by_invite_code", { code: inviteCode.toUpperCase() })
+    .single()) as { data: { id: string }; error: unknown };
+
   if (findError || !household) {
-    return { error: "Kode undangan tidak valid." }
+    return { error: "Kode undangan tidak valid." };
   }
 
   // 2. Check if already a member
@@ -75,26 +80,64 @@ export async function joinHousehold(inviteCode: string) {
     .select("household_id")
     .eq("household_id", household.id)
     .eq("user_id", user.id)
-    .single()
-  
+    .single();
+
   if (existingMember) {
-      redirect("/dashboard")
-      return;
+    redirect("/dashboard");
+    return;
   }
 
   // 3. Add as Member
-  const { error: joinError } = await supabase
-    .from("household_members")
-    .insert({
-      household_id: household.id,
-      user_id: user.id,
-      role: "istri",
-    })
+  const { error: joinError } = await supabase.from("household_members").insert({
+    household_id: household.id,
+    user_id: user.id,
+    role: "istri",
+  });
 
   if (joinError) {
-    console.error("Error joining household:", joinError)
-    return { error: joinError.message }
+    console.error("Error joining household:", joinError);
+    return { error: joinError.message };
   }
 
-  redirect("/dashboard")
+  redirect("/dashboard");
+}
+
+export async function updateHouseholdName(householdId: string, name: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Unauthorized" };
+  }
+
+  // Verify user is owner/suami of this household
+  const { data: member } = await supabase
+    .from("household_members")
+    .select("role")
+    .eq("household_id", householdId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (!member || member.role !== "suami") {    
+    return { error: "Hanya pemilik keluarga yang dapat mengubah nama" };
+  }
+
+  // Update household name
+  const { error } = await supabase
+    .from("households")
+    .update({ name })
+    .eq("id", householdId)
+    .select();
+
+  if (error) {
+    console.error("❌ Error updating household name:", error);
+    return { error: error.message };
+  }
+
+  // Revalidate the settings page to show updated data
+  revalidatePath("/dashboard/settings");
+
+  return { success: true };
 }

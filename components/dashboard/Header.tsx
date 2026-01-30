@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
 import { useSidebar } from "./sidebar-context"
 
-export function DashboardHeader() {
+interface DashboardHeaderProps {
+    householdName?: string
+}
+
+export function DashboardHeader({ householdName }: DashboardHeaderProps) {
   const { toggle } = useSidebar()
 
   return (
@@ -14,8 +18,8 @@ export function DashboardHeader() {
         <Button variant="ghost" size="icon" onClick={toggle}>
            <Menu className="h-5 w-5" />
         </Button>
-        <span className="font-bold">FamilyFintech</span>
       </div>
+      <span className="font-bold text-zinc-900 dark:text-zinc-100 md:text-xl">{householdName}</span>
       <div className="ml-auto flex items-center gap-4">
         <ModeToggle />
       </div>

@@ -1,6 +1,9 @@
 import Link from "next/link"
 import { LoginForm } from "@/components/auth/LoginForm"
 
+// Force dynamic rendering because LoginForm uses useSearchParams
+export const dynamic = 'force-dynamic'
+
 export default function LoginPage() {
   return (
     <div className="space-y-6">
