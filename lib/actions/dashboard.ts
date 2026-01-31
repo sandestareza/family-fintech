@@ -24,11 +24,18 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
   if (!member) return { income: 0, expense: 0, totalAssets: 0, savings: 0 }
 
-  // 2. Aggregate Transactions for current month (Simplified for now: All Time)
+  // Get current month date range
+  const now = new Date()
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
+
+  // 2. Aggregate Transactions for current month
   const { data: transactions } = await supabase
     .from("transactions")
     .select("amount, type")
     .eq("household_id", member.household_id)
+    .gte("date", startOfMonth)
+    .lte("date", endOfMonth)
 
   // 3. Get Total Assets from Wallets
   const { data: wallets } = await supabase

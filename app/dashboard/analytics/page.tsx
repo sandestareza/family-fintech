@@ -16,6 +16,11 @@ export default async function AnalyticsPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">Analytics</h2>
       </div>
+
+      {/* Mutation List */}
+      <div className="grid gap-4">
+        <AnalyticsTransactionList transactions={recentTransactions} />
+      </div>
       
       {/* Top Row: Trend */}
       <div className="grid gap-4 md:grid-cols-1">
@@ -44,10 +49,7 @@ export default async function AnalyticsPage() {
         </Card>
       </div>
 
-      {/* Mutation List */}
-      <div className="grid gap-4">
-        <AnalyticsTransactionList transactions={recentTransactions} />
-      </div>
+      
     </div>
   )
 }
