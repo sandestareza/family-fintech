@@ -30,7 +30,7 @@ export async function getMonthlyTrend() {
   for (let i = 5; i >= 0; i--) {
       const d = new Date()
       d.setMonth(d.getMonth() - i)
-      const key = d.toISOString().slice(0, 7) // YYYY-MM
+      const key = d.toLocaleDateString("en-CA").slice(0, 7) // YYYY-MM
       const name = d.toLocaleString('default', { month: 'short' })
       monthlyData[key] = { name, income: 0, expense: 0 }
   }
@@ -156,7 +156,6 @@ export async function getRecentTransactionsExpanded() {
       `)
       .eq("household_id", member.household_id)
       .order('date', { ascending: false })
-      .limit(10)
   
     if (!transactions) return []
     
@@ -166,6 +165,7 @@ export async function getRecentTransactionsExpanded() {
       
       return {
         ...t,
+        description: t.description || 'Tanpa keterangan',
         wallets: walletName ? { name: walletName } : null,
         categories: categoryData ? { name: categoryData.name, icon: categoryData.icon } : null
       }

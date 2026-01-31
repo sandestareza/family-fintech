@@ -76,11 +76,6 @@ export function AddCategoryDialog({
     }
   }
 
-  // Update default type if it changes
-  // useEffect(() => {
-  //     form.setValue("type", defaultType)
-  // }, [defaultType, form])
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>

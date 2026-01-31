@@ -1,32 +1,73 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowDown, ArrowUp, Wallet, TrendingUp, Eye, EyeOff } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Wallet,
+  TrendingUp,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { DashboardStats } from "@/lib/actions/dashboard";
 import { formatCurrency } from "@/lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import SummaryCardsSkeleton from "./SummaryCardsSkeleton";
 
 // Get current month name in Indonesian
 const getCurrentMonthName = () => {
   const months = [
-    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
   ];
   return months[new Date().getMonth()];
 };
 
 export function SummaryCards({ stats }: { stats: DashboardStats }) {
   const currentMonth = getCurrentMonthName();
-  const [showAssets, setShowAssets] = useState(true);
-  
+
+  const [mounted, setMounted] = useState(false);
+  const [showAssets, setShowAssets] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+
+    const saved = localStorage.getItem("showAssets");
+    if (saved !== null) {
+      setShowAssets(JSON.parse(saved));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem("showAssets", JSON.stringify(showAssets));
+    }
+  }, [showAssets, mounted]);
+
+  if (!mounted) return <SummaryCardsSkeleton />
+
+  const handleShowAssets = () => {
+    setShowAssets((prev) => !prev);
+  };
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Aset</CardTitle>
-          <div className="flex items-center gap-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
+            Total Aset
             <button
-              onClick={() => setShowAssets(!showAssets)}
+              onClick={handleShowAssets}
               className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
               aria-label={showAssets ? "Sembunyikan saldo" : "Tampilkan saldo"}
             >
@@ -36,6 +77,8 @@ export function SummaryCards({ stats }: { stats: DashboardStats }) {
                 <EyeOff className="h-4 w-4" />
               )}
             </button>
+          </CardTitle>
+          <div className="flex items-center gap-2">
             <Wallet className="h-4 w-4 text-zinc-500" />
           </div>
         </CardHeader>

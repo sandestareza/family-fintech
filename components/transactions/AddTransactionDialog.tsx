@@ -291,7 +291,7 @@ export function AddTransactionDialog({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Catatan (Opsional)</FormLabel>
+                  <FormLabel>Catatan</FormLabel>
                   <FormControl>
                     <Input placeholder="Makan siang..." {...field} />
                   </FormControl>

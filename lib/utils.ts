@@ -15,6 +15,11 @@ export const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-export const formatDate = (dateString: string | Date, formatString: string = "dd/MM/yyyy") => {
+export const formatDate = (
+  dateString: string | Date,
+  formatString: string = "dd/MM/yyyy",
+) => {
   return format(new Date(dateString), formatString, { locale: id });
 };
+
+export const formatLocalDate = (date: Date) => date.toLocaleDateString("en-CA"); // YYYY-MM-DD

@@ -1,6 +1,7 @@
 import {
   getDashboardStats,
   getRecentTransactions,
+  getRecentTransactionsByLimit,
 } from "@/lib/actions/dashboard";
 import { getMonthlyStats } from "@/lib/actions/chart";
 import { getCategories } from "@/lib/actions/transactions";
@@ -34,7 +35,7 @@ export default async function DashboardPage() {
   }
 
   const stats = await getDashboardStats();
-  const transactions = await getRecentTransactions();
+  const transactions = await getRecentTransactionsByLimit(5);
   const monthlyStats = await getMonthlyStats();
   const categories = await getCategories();
 

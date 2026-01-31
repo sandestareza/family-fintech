@@ -32,12 +32,10 @@ export function TransactionList({
   transactions, 
   categories, 
   wallets, // Added wallets prop
-  currency = "IDR" 
 }: { 
   transactions: Transaction[]
   categories: Category[]
   wallets: Wallet[]
-  currency?: string 
 }) {
     const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
     const [isEditOpen, setIsEditOpen] = useState(false)
@@ -76,7 +74,7 @@ export function TransactionList({
                             {t.type === 'income' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
                         </div>
                         <div className="ml-4 space-y-1 flex-1">
-                            <p className="text-sm font-medium leading-none">{t.description}</p>
+                            <p className="text-sm font-medium leading-none">{t.description} - <span className="text-xs text-zinc-500 italic">({t.wallet?.name})</span></p>
                             <p className="text-xs text-zinc-500">{t.category?.name || 'Uncategorized'} • {t.date}</p>
                         </div>
                         <div className={`mr-4 font-medium ${t.type === 'income' ? 'text-emerald-600' : 'text-red-600'}`}>

@@ -114,6 +114,18 @@ export async function transferFunds(data: {
 
     const transferId = randomUUID()
 
+    const { data: nameFromWallet } = await supabase
+      .from("wallets")
+      .select("name")
+      .eq("id", data.fromWalletId)
+      .single()
+
+    const { data: nameToWallet } = await supabase
+      .from("wallets")
+      .select("name")
+      .eq("id", data.toWalletId)
+      .single()
+
     // 1. Outgoing Transaction (Expense)
     const { error: errorOut } = await supabase.from("transactions").insert({
         household_id: member.household_id,
@@ -121,7 +133,7 @@ export async function transferFunds(data: {
         wallet_id: data.fromWalletId,
         amount: data.amount, // Positive amount, but type is expense so it reduces balance
         type: 'expense',
-        description: `Transfer ke ${data.description || 'Dompet Lain'}`,
+        description: `Transfer ke ${nameToWallet?.name || 'Dompet Lain'}`,
         date: data.date,
         transfer_id: transferId
     })
@@ -135,7 +147,7 @@ export async function transferFunds(data: {
         wallet_id: data.toWalletId,
         amount: data.amount,
         type: 'income',
-        description: `Transfer dari ${data.description || 'Dompet Lain'}`,
+        description: `Transfer dari ${nameFromWallet?.name || 'Dompet Lain'}`,
         date: data.date,
         transfer_id: transferId
     })

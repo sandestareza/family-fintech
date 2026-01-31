@@ -7,7 +7,7 @@ export const transactionSchema = z.object({
   }),
   categoryId: z.string().min(1, { message: "Pilih kategori" }),
   walletId: z.string().min(1, { message: "Pilih dompet" }),
-  description: z.string().optional(),
+  description: z.string().min(1, { message: "Catatan harus diisi" }),
   date: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: "Format tanggal tidak valid",
   }),

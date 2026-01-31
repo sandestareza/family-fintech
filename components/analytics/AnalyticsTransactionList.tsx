@@ -105,7 +105,7 @@ export function AnalyticsTransactionList({ transactions }: { transactions: Trans
                 {/* Grand Total Summary */}
                 <div className="mb-6 p-4 rounded-lg bg-zinc-50 dark:bg-zinc-900 border">
                     <h4 className="text-sm font-medium text-zinc-500 mb-3">Total Keseluruhan</h4>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <p className="text-xs text-zinc-500">Pemasukan</p>
                             <p className="text-lg font-bold text-emerald-600">+{formatCurrency(grandTotals.income)}</p>
@@ -129,21 +129,16 @@ export function AnalyticsTransactionList({ transactions }: { transactions: Trans
                     ) : (
                         walletNames.map((walletName) => (
                             <div key={walletName} className="space-y-3">
-                                <div className="flex items-center justify-between">
+                                <div className="flex md:flex-row flex-col justify-between">
                                     <h3 className="font-semibold text-lg flex items-center gap-2">
                                         <div className="h-2 w-2 rounded-full bg-blue-500"></div>
                                         {walletName}
                                     </h3>
                                     {/* Wallet Totals */}
-                                    <div className="flex items-center gap-4 text-sm">
-                                        <span className="text-emerald-600">
-                                            +{formatCurrency(walletTotals[walletName]?.income || 0)}
-                                        </span>
-                                        <span className="text-red-600">
-                                            -{formatCurrency(walletTotals[walletName]?.expense || 0)}
-                                        </span>
+                                    <div className="flex items-center gap-1 text-sm">
+                                        <span className="text-xs text-zinc-500 font-medium">Saldo :</span>
                                         <span className={`font-medium ${(walletTotals[walletName]?.net || 0) >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
-                                            = {formatCurrency(walletTotals[walletName]?.net || 0)}
+                                             {formatCurrency(walletTotals[walletName]?.net || 0)}
                                         </span>
                                     </div>
                                 </div>

@@ -1,33 +1,45 @@
-"use server"
+"use server";
 
-import { createClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server";
+import { formatLocalDate } from "../utils";
 
 export interface DashboardStats {
-  income: number
-  expense: number
-  totalAssets: number
-  savings: number
+  income: number;
+  expense: number;
+  totalAssets: number;
+  savings: number;
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!user) return { income: 0, expense: 0, totalAssets: 0, savings: 0 }
+  if (!user) return { income: 0, expense: 0, totalAssets: 0, savings: 0 };
 
   // 1. Get User's Household
   const { data: member } = await supabase
     .from("household_members")
     .select("household_id")
     .eq("user_id", user.id)
-    .single()
+    .single();
 
-  if (!member) return { income: 0, expense: 0, totalAssets: 0, savings: 0 }
+  if (!member) return { income: 0, expense: 0, totalAssets: 0, savings: 0 };
 
   // Get current month date range
-  const now = new Date()
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
-  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
+  //   const now = new Date()
+  //   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
+  //   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0] 
+  const now = new Date();
+
+  const startOfMonth = formatLocalDate(
+    new Date(now.getFullYear(), now.getMonth(), 1),
+  );
+
+  const endOfMonth = formatLocalDate(
+    new Date(now.getFullYear(), now.getMonth() + 1, 0),
+  );
 
   // 2. Aggregate Transactions for current month
   const { data: transactions } = await supabase
@@ -35,92 +47,177 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     .select("amount, type")
     .eq("household_id", member.household_id)
     .gte("date", startOfMonth)
-    .lte("date", endOfMonth)
+    .lte("date", endOfMonth);
 
   // 3. Get Total Assets from Wallets
   const { data: wallets } = await supabase
     .from("wallets")
     .select("balance")
-    .eq("household_id", member.household_id)
+    .eq("household_id", member.household_id);
 
-  const totalAssets = wallets?.reduce((acc, curr) => acc + Number(curr.balance), 0) || 0
+  const totalAssets =
+    wallets?.reduce((acc, curr) => acc + Number(curr.balance), 0) || 0;
 
-  if (!transactions) return { income: 0, expense: 0, totalAssets, savings: 0 }
+  if (!transactions) return { income: 0, expense: 0, totalAssets, savings: 0 };
 
   const income = transactions
-    .filter(t => t.type === 'income')
-    .reduce((acc, curr) => acc + Number(curr.amount), 0)
+    .filter((t) => t.type === "income")
+    .reduce((acc, curr) => acc + Number(curr.amount), 0);
 
   const expense = transactions
-    .filter(t => t.type === 'expense')
-    .reduce((acc, curr) => acc + Number(curr.amount), 0)
+    .filter((t) => t.type === "expense")
+    .reduce((acc, curr) => acc + Number(curr.amount), 0);
+
+  const savings = income - expense;
 
   return {
     income,
     expense,
     totalAssets,
-    savings: income - expense
-  }
+    savings,
+  };
 }
 
 export interface Transaction {
-  id: string
-  amount: number
-  type: 'income' | 'expense'
-  description: string
-  date: string
-  walletId: string // Added walletId
+  id: string;
+  amount: number;
+  type: "income" | "expense";
+  description: string;
+  date: string;
+  walletId: string; // Added walletId
+  wallet?: {
+    name: string;
+  };
   category?: {
-    name: string
-    icon: string
-  }
+    name: string;
+    icon: string;
+  };
 }
 
 export async function getRecentTransactions(): Promise<Transaction[]> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!user) return []
+  if (!user) return [];
 
   const { data: member } = await supabase
     .from("household_members")
     .select("household_id")
     .eq("user_id", user.id)
-    .single()
+    .single();
 
-  if (!member) return []
+  if (!member) return [];
 
   const { data: transactions } = await supabase
     .from("transactions")
-    .select(`
+    .select(
+      `
       id,
       amount,
       type,
       description,
       date,
       wallet_id,
+      wallets (
+        name
+      ),
       categories (
         name,
         icon
       )
-    `)
+    `,
+    )
     .eq("household_id", member.household_id)
-    .order('date', { ascending: false })
-    .limit(5)
+    .order("date", { ascending: false });
 
-  if (!transactions) return []
+  if (!transactions) return [];
 
   // Map to cleaner interface
-  return transactions.map(t => ({
+  return transactions.map((t) => ({
     id: t.id,
     amount: Number(t.amount),
-    type: t.type as 'income' | 'expense',
-    description: t.description || 'Tanpa keterangan',
+    type: t.type as "income" | "expense",
+    description: t.description || "Tanpa keterangan",
+    wallet: t.wallets
+      ? {
+          name: (t.wallets as unknown as { name: string }).name,
+        }
+      : undefined,
     date: t.date,
     walletId: t.wallet_id, // Map wallet_id
-    category: t.categories ? {
-        name: (t.categories as unknown as { name: string }).name,
-        icon: (t.categories as unknown as { icon: string }).icon
-    } : undefined
-  }))
+    category: t.categories
+      ? {
+          name: (t.categories as unknown as { name: string }).name,
+          icon: (t.categories as unknown as { icon: string }).icon,
+        }
+      : undefined,
+  }));
 }
+
+export async function getRecentTransactionsByLimit(
+  limit: number,
+): Promise<Transaction[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return [];
+
+  const { data: member } = await supabase
+    .from("household_members")
+    .select("household_id")
+    .eq("user_id", user.id)
+    .single();
+
+  if (!member) return [];
+
+  const { data: transactions } = await supabase
+    .from("transactions")
+    .select(
+      `
+      id,
+      amount,
+      type,
+      description,
+      date,
+      wallet_id,
+      wallets (
+        name
+      ),
+      categories (
+        name,
+        icon
+      )
+    `,
+    )
+    .eq("household_id", member.household_id)
+    .order("date", { ascending: false })
+    .limit(limit);
+
+  if (!transactions) return [];
+
+  // Map to cleaner interface
+  return transactions.map((t) => ({
+    id: t.id,
+    amount: Number(t.amount),
+    type: t.type as "income" | "expense",
+    description: t.description || "Tanpa keterangan",
+    wallet: t.wallets
+      ? {
+          name: (t.wallets as unknown as { name: string }).name,
+        }
+      : undefined,
+    date: t.date,
+    walletId: t.wallet_id,
+    category: t.categories
+      ? {
+          name: (t.categories as unknown as { name: string }).name,
+          icon: (t.categories as unknown as { icon: string }).icon,
+        }
+      : undefined,
+  }));
+}
+
