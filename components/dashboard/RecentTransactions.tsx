@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Transaction } from "@/lib/actions/dashboard"
 import { ArrowDown, ArrowUp } from "lucide-react"
-import { formatCurrency } from "@/lib/utils"
+import { formatCurrency, formatDate } from "@/lib/utils"
 
 export function RecentTransactions({ transactions }: { transactions: Transaction[] }) {
 
@@ -22,7 +22,7 @@ export function RecentTransactions({ transactions }: { transactions: Transaction
                         </div>
                         <div className="ml-4 space-y-1">
                             <p className="text-sm font-medium leading-none">{t.description}</p>
-                            <p className="text-xs text-zinc-500">{t.category?.name || 'Uncategorized'} • {t.date}</p>
+                            <p className="text-xs text-zinc-500">{t.category?.name || 'Uncategorized'} • {formatDate(t.date)}</p>
                         </div>
                         <div className={`ml-auto font-medium ${t.type === 'income' ? 'text-emerald-600' : 'text-red-600'}`}>
                             {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}

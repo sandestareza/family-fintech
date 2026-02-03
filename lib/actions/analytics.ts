@@ -21,7 +21,7 @@ export async function getMonthlyTrend() {
     .from("transactions")
     .select("amount, type, date")
     .eq("household_id", member.household_id)
-    .order('date', { ascending: true })
+    .order('created_at', { ascending: true })
 
   if (!transactions) return []
 
@@ -155,7 +155,7 @@ export async function getRecentTransactionsExpanded() {
         categories (name, icon)
       `)
       .eq("household_id", member.household_id)
-      .order('date', { ascending: false })
+      .order('created_at', { ascending: false })
   
     if (!transactions) return []
     

@@ -13,7 +13,7 @@ import {
 import { useState } from "react"
 import { deleteTransaction } from "@/lib/actions/transactions"
 import { EditTransactionDialog } from "./EditTransactionDialog"
-import { formatCurrency } from "@/lib/utils"
+import { formatCurrency, formatDate } from "@/lib/utils"
 import { toast } from "sonner"
 
 interface Category {
@@ -75,7 +75,7 @@ export function TransactionList({
                         </div>
                         <div className="ml-4 space-y-1 flex-1">
                             <p className="text-sm font-medium leading-none">{t.description} - <span className="text-xs text-zinc-500 italic">({t.wallet?.name})</span></p>
-                            <p className="text-xs text-zinc-500">{t.category?.name || 'Uncategorized'} • {t.date}</p>
+                            <p className="text-xs text-zinc-500">{t.category?.name || 'Uncategorized'} • {formatDate(t.date)}</p>
                         </div>
                         <div className={`mr-4 font-medium ${t.type === 'income' ? 'text-emerald-600' : 'text-red-600'}`}>
                             {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}

@@ -130,7 +130,7 @@ export async function getRecentTransactions(): Promise<Transaction[]> {
     `,
     )
     .eq("household_id", member.household_id)
-    .order("date", { ascending: false });
+    .order("created_at", { ascending: false });
 
   if (!transactions) return [];
 
@@ -194,7 +194,7 @@ export async function getRecentTransactionsByLimit(
     `,
     )
     .eq("household_id", member.household_id)
-    .order("date", { ascending: false })
+    .order("created_at", { ascending: false })
     .limit(limit);
 
   if (!transactions) return [];

@@ -154,7 +154,7 @@ export function AnalyticsTransactionList({ transactions }: { transactions: Trans
                                                     <div className="flex items-center gap-2 text-xs text-zinc-500">
                                                         <span>{t.categories?.name || 'Uncategorized'}</span>
                                                         <span>•</span>
-                                                        <span>{formatDate(t.date, "dd MMMM yyyy")}</span>
+                                                        <span>{formatDate(t.date)}</span>
                                                     </div>
                                                 </div>
                                             </div>
