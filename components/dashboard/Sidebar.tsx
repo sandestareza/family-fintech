@@ -12,7 +12,8 @@ import {
   BarChart,
   ArrowLeftRight,
   ChevronUp,
-  FileText
+  FileText,
+  Clock
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
@@ -42,6 +43,11 @@ const sidebarItems = [
     title: "Transactions",
     href: "/dashboard/transactions",
     icon: ArrowLeftRight,
+  },
+  {
+    title: "Tagihan",
+    href: "/dashboard/bills",
+    icon: Clock,
   },
   {
     title: "Budget",

@@ -10,6 +10,8 @@ import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
 import { OverviewChart } from "@/components/dashboard/OverviewChart";
 import { AddTransactionDialog } from "@/components/transactions/AddTransactionDialog";
 import { getWallets } from "@/lib/actions/wallets";
+import { getBills } from "@/lib/actions/bills";
+import { UpcomingBills } from "@/components/dashboard/UpcomingBills";
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -40,6 +42,8 @@ export default async function DashboardPage() {
   const categories = await getCategories();
 
   const wallets = await getWallets();
+  const bills = await getBills(); // Fetch bills
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -50,13 +54,16 @@ export default async function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <RecentTransactions transactions={transactions} />
         <div className="col-span-4 lg:col-span-4 rounded-xl border bg-card text-card-foreground shadow">
+        <UpcomingBills bills={bills} wallets={wallets} />
+        </div>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 rounded-xl border bg-card text-card-foreground shadow">
           <div className="p-6">
             <h3 className="font-semibold leading-none tracking-tight mb-4">
               Financial Overview
             </h3>
             <OverviewChart data={monthlyStats} />
           </div>
-        </div>
       </div>
     </div>
   );

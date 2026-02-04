@@ -3,12 +3,17 @@ import { DashboardHeader } from "@/components/dashboard/Header";
 import { SidebarProvider } from "@/components/dashboard/sidebar-context";
 import { createClient } from "@/lib/supabase/server";
 
+import { BillsNotification } from "@/components/bills/BillsNotification";
+import { getBills } from "@/lib/actions/bills";
+
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
+  const bills = await getBills();
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -57,6 +62,7 @@ export default async function DashboardLayout({
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-900">
+        <BillsNotification bills={bills} />
         <DashboardSidebar user={userProfile || undefined} />
         <div className="flex flex-1 flex-col">
           <DashboardHeader householdName={householdName || undefined} />
