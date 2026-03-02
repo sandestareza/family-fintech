@@ -2,6 +2,8 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { toZonedTime } from "date-fns-tz"
+import { formatLocalDate } from "../utils"
 
 export async function createBudget(data: {
   categoryId: string
@@ -95,10 +97,10 @@ export async function getBudgets(): Promise<BudgetProgress[]> {
   // 2. Calculate spent amount for each budget (Current Month)
   // Simplified: fetching all transactions for the category for this month
   // In prod: aggregations on DB side are better
-  
-  const startOfMonth = new Date()
-  startOfMonth.setDate(1)
-  startOfMonth.setHours(0,0,0,0) // Start of current month
+  const TIMEZONE = "Asia/Jakarta"
+  const now = new Date()
+  const zonedNow = toZonedTime(now, TIMEZONE)
+  const startOfMonth = new Date(zonedNow.getFullYear(), zonedNow.getMonth(), 1)
 
   const budgetProgress: BudgetProgress[] = []
 
@@ -113,7 +115,7 @@ export async function getBudgets(): Promise<BudgetProgress[]> {
         .eq("household_id", member.household_id)
         .eq("category_id", categoryId)
         .eq("type", "expense")
-        .gte("date", startOfMonth.toISOString())
+        .gte("date", formatLocalDate(startOfMonth))
       
       const spent = transactions?.reduce((sum, t) => sum + Number(t.amount), 0) || 0
       

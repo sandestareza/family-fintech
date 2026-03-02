@@ -1,6 +1,8 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { toZonedTime } from "date-fns-tz"
+import { formatLocalDate } from "../utils"
 
 export interface MonthlyStats {
   name: string
@@ -22,11 +24,13 @@ export async function getMonthlyStats(): Promise<MonthlyStats[]> {
 
   if (!member) return []
 
-  // Get current year date range
+  // Get current year date range respecting user timezone
+  const TIMEZONE = "Asia/Jakarta"
   const now = new Date()
-  const currentYear = now.getFullYear()
-  const startOfYear = new Date(currentYear, 0, 1).toISOString().split('T')[0]
-  const endOfYear = new Date(currentYear, 11, 31).toISOString().split('T')[0]
+  const zonedNow = toZonedTime(now, TIMEZONE)
+  const currentYear = zonedNow.getFullYear()
+  const startOfYear = formatLocalDate(new Date(currentYear, 0, 1))
+  const endOfYear = formatLocalDate(new Date(currentYear, 11, 31))
 
   // Fetch transactions for the current year only
   const { data: transactions } = await supabase
@@ -49,7 +53,7 @@ export async function getMonthlyStats(): Promise<MonthlyStats[]> {
   }
 
   transactions.forEach(t => {
-      const date = new Date(t.date)
+      const date = toZonedTime(new Date(t.date), TIMEZONE)
       const monthIndex = date.getMonth()
       const monthName = monthNames[monthIndex]
       

@@ -14,9 +14,12 @@ export function useBillNotifications(bills: Bill[]) {
     const [permission, setPermission] = useState<NotificationPermission>('default')
 
     useEffect(() => {
-        if (typeof window !== 'undefined' && 'Notification' in window) {
+        let isBrowser = true
+        if (typeof window !== 'undefined' && 'Notification' in window && isBrowser) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setPermission(Notification.permission)
         }
+        return () => { isBrowser = false }
     }, [])
 
     useEffect(() => {

@@ -1,0 +1,22 @@
+
+D:\Project\PRIBADI\family-fintech-saas\app\dashboard\page.tsx
+  3:3  warning  'getRecentTransactions' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Project\PRIBADI\family-fintech-saas\components\budget\CreateBudgetDialog.tsx
+  21:10  warning  'Input' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Project\PRIBADI\family-fintech-saas\components\dashboard\SummaryCards.tsx
+  43:9  error  'isMounted' is never reassigned. Use 'const' instead  prefer-const
+
+D:\Project\PRIBADI\family-fintech-saas\components\reports\ReportFilters.tsx
+  18:10  warning  'format' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Project\PRIBADI\family-fintech-saas\components\wallets\EditWalletDialog.tsx
+  21:10  warning  'CurrencyInput' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Project\PRIBADI\family-fintech-saas\lib\actions\bills.ts
+  128:11  warning  'error' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 6 problems (1 error, 5 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

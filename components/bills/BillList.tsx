@@ -1,6 +1,7 @@
 "use client";
 
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
+import { ClientDate } from "@/components/ui/client-date";
 import {
   CheckCircle,
   Clock,
@@ -142,7 +143,7 @@ export function BillList({
               <span
                 className={`${isOverdue ? "text-red-500 font-medium" : ""}`}
               >
-                {formatDate(bill.due_date)}
+                <ClientDate date={bill.due_date} />
               </span>
               {bill.frequency !== "one_time" && (
                 <>

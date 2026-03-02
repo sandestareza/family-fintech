@@ -17,6 +17,7 @@ import {
 import { cn, formatDate } from "@/lib/utils"
 import { format } from "date-fns"
 import { id } from "date-fns/locale"
+import { ClientDate } from "@/components/ui/client-date"
 import { CalendarIcon, FilterX, Printer } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useState, useEffect } from "react"
@@ -108,11 +109,11 @@ export function ReportFilters({ wallets }: { wallets: Wallet[] }) {
                     {date?.from ? (
                     date.to ? (
                         <>
-                        {formatDate(date.from, "dd LLL y")} -{" "}
-                        {formatDate(date.to, "dd LLL y")}
+                        <ClientDate date={date.from} formatString="dd LLL y" /> -{" "}
+                        <ClientDate date={date.to} formatString="dd LLL y" />
                         </>
                     ) : (
-                        formatDate(date.from, "dd LLL y")
+                        <ClientDate date={date.from} formatString="dd LLL y" />
                     )
                     ) : (
                     <span>Pilih Tanggal</span>

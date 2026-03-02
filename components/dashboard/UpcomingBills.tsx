@@ -1,7 +1,8 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { formatCurrency, formatDate } from "@/lib/utils"
+import { formatCurrency } from "@/lib/utils"
+import { ClientDate } from "@/components/ui/client-date"
 import { Clock, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -98,7 +99,7 @@ export function UpcomingBills({ bills, wallets }: { bills: Bill[], wallets: Wall
                                 <div>
                                     <p className="text-sm font-medium leading-none">{bill.name}</p>
                                     <p className="text-xs text-muted-foreground mt-1">
-                                        {formatDate(bill.due_date)} • {bill.categories?.name}
+                                        <ClientDate date={bill.due_date} /> • {bill.categories?.name}
                                     </p>
                                 </div>
                             </div>

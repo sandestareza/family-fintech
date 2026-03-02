@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { formatLocalDate } from "../utils";
+import { toZonedTime } from "date-fns-tz";
 
 export interface DashboardStats {
   income: number;
@@ -27,18 +28,17 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
   if (!member) return { income: 0, expense: 0, totalAssets: 0, savings: 0 };
 
-  // Get current month date range
-  //   const now = new Date()
-  //   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
-  //   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0] 
+  // Get current month date range respecting user timezone (using Asia/Jakarta for Indonesia default)
+  const TIMEZONE = "Asia/Jakarta";
   const now = new Date();
+  const zonedNow = toZonedTime(now, TIMEZONE);
 
   const startOfMonth = formatLocalDate(
-    new Date(now.getFullYear(), now.getMonth(), 1),
+    new Date(zonedNow.getFullYear(), zonedNow.getMonth(), 1),
   );
 
   const endOfMonth = formatLocalDate(
-    new Date(now.getFullYear(), now.getMonth() + 1, 0),
+    new Date(zonedNow.getFullYear(), zonedNow.getMonth() + 1, 0),
   );
 
   // 2. Aggregate Transactions for current month

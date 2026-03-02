@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { toZonedTime } from "date-fns-tz"
 
 export interface ExpenseByCategory {
   category: string
@@ -27,11 +28,15 @@ export async function getMonthlyTrend() {
 
   // Initialize last 6 months
   const monthlyData: Record<string, { name: string; income: number; expense: number }> = {}
+  const TIMEZONE = "Asia/Jakarta"
   for (let i = 5; i >= 0; i--) {
-      const d = new Date()
+      const now = new Date()
+      const d = toZonedTime(now, TIMEZONE)
       d.setMonth(d.getMonth() - i)
-      const key = d.toLocaleDateString("en-CA").slice(0, 7) // YYYY-MM
-      const name = d.toLocaleString('default', { month: 'short' })
+      const year = d.getFullYear()
+      const month = String(d.getMonth() + 1).padStart(2, '0')
+      const key = `${year}-${month}` // YYYY-MM
+      const name = d.toLocaleString('id-ID', { month: 'short' })
       monthlyData[key] = { name, income: 0, expense: 0 }
   }
 

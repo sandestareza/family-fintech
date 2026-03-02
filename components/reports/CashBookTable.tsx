@@ -11,7 +11,8 @@ import {
 import { LedgerTransaction } from "@/lib/actions/reports"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowDownCircle, ArrowUpCircle } from "lucide-react"
-import { formatCurrency, formatDate } from "@/lib/utils"
+import { formatCurrency } from "@/lib/utils"
+import { ClientDate } from "@/components/ui/client-date"
 
 export function CashBookTable({ transactions }: { transactions: LedgerTransaction[] }) {
 
@@ -34,7 +35,7 @@ export function CashBookTable({ transactions }: { transactions: LedgerTransactio
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1">
                       <div className="font-medium text-sm mb-1">{t.category_name}</div>
-                      <div className="text-xs text-muted-foreground">{formatDate(t.date)}</div>
+                      <div className="text-xs text-muted-foreground"><ClientDate date={t.date} /></div>
                     </div>
                     <div className={`flex items-center gap-1 font-semibold ${t.type === 'income' ? 'text-emerald-600' : 'text-red-600'}`}>
                       {t.type === 'income' ? (
@@ -86,7 +87,7 @@ export function CashBookTable({ transactions }: { transactions: LedgerTransactio
               ) : (
                 transactions.map((t) => (
                   <TableRow key={t.id}>
-                    <TableCell>{formatDate(t.date)}</TableCell>
+                    <TableCell><ClientDate date={t.date} /></TableCell>
                     <TableCell>{t.wallet_name}</TableCell>
                     <TableCell>{t.category_name}</TableCell>
                     <TableCell>{t.description}</TableCell>

@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { BillValues } from "@/lib/validations/bills"
+import { toZonedTime } from "date-fns-tz"
+import { formatLocalDate } from "../utils"
 
 export async function getBills() {
   const supabase = await createClient()
@@ -123,7 +125,7 @@ export async function markBillAsPaid(id: string, walletId: string) {
   }
 
   // 3. Create Transaction
-  const { error: transactionError } = await supabase.from("transactions").insert({
+  const { error } = await supabase.from("transactions").insert({
     household_id: bill.household_id,
     user_id: user.id,
     wallet_id: walletId,
@@ -131,13 +133,13 @@ export async function markBillAsPaid(id: string, walletId: string) {
     amount: bill.amount, // Expense triggers wallet deduction
     type: 'expense',
     description: `Bayar Tagihan: ${bill.name}`,
-    date: new Date().toISOString()
+    date: toZonedTime(new Date(), "Asia/Jakarta").toISOString()
   })
 
   // 4. Handle recurring logic
   if (bill.frequency !== 'one_time') {
     const currentDueDate = new Date(bill.due_date)
-    let nextDueDate = new Date(currentDueDate)
+    const nextDueDate = new Date(currentDueDate)
 
     if (bill.frequency === 'monthly') {
       nextDueDate.setMonth(nextDueDate.getMonth() + 1)
@@ -149,7 +151,7 @@ export async function markBillAsPaid(id: string, walletId: string) {
       household_id: bill.household_id,
       name: bill.name,
       amount: bill.amount,
-      due_date: nextDueDate.toISOString().split('T')[0], // YYYY-MM-DD
+      due_date: formatLocalDate(nextDueDate), // YYYY-MM-DD
       frequency: bill.frequency,
       category_id: bill.category_id,
       status: 'unpaid'

@@ -49,7 +49,7 @@ interface Category {
 }
 
 interface EditBillDialogProps {
-  bill: any // Using specific type would be better but keeping it simple for now
+  bill: { id: string; name: string; amount: number; due_date: string; category_id?: string; frequency: string } | null;
   categories: Category[]
   open: boolean
   onOpenChange: (open: boolean) => void

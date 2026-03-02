@@ -3,8 +3,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowDown, ArrowUp, Wallet } from "lucide-react"
-import { formatCurrency, formatDate } from "@/lib/utils"
+import { formatCurrency } from "@/lib/utils"
 import { useState, useMemo } from "react"
+import { ClientDate } from "@/components/ui/client-date"
 
 interface Transaction {
     id: string
@@ -154,7 +155,7 @@ export function AnalyticsTransactionList({ transactions }: { transactions: Trans
                                                     <div className="flex items-center gap-2 text-xs text-zinc-500">
                                                         <span>{t.categories?.name || 'Uncategorized'}</span>
                                                         <span>•</span>
-                                                        <span>{formatDate(t.date)}</span>
+                                                        <span><ClientDate date={t.date} /></span>
                                                     </div>
                                                 </div>
                                             </div>

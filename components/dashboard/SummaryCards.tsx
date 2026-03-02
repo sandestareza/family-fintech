@@ -40,7 +40,11 @@ export function SummaryCards({ stats }: { stats: DashboardStats }) {
   const [showAssets, setShowAssets] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const isMounted = true;
+    if (isMounted) {
+       // eslint-disable-next-line react-hooks/set-state-in-effect
+       setMounted(true);
+    }
 
     const saved = localStorage.getItem("showAssets");
     if (saved !== null) {

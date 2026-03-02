@@ -34,7 +34,7 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon, Loader2 } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   transactionSchema,
@@ -104,7 +104,10 @@ export function EditTransactionDialog({
   }, [transaction, categories, form]);
 
   // Filter categories based on selected type
-  const type = form.watch("type");
+  const type = useWatch({
+    control: form.control,
+    name: "type",
+  });
   const filteredCategories = categories.filter((c) => c.type === type);
 
   async function onSubmit(data: TransactionValues) {
